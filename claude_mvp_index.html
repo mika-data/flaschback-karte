@@ -106,6 +106,7 @@
         // ====================================================================
 
         let scene, camera, renderer, controls;
+        let treeGroup;
 
         function initThreeJS() {
             const container = document.getElementById('canvas-container');
@@ -126,6 +127,9 @@
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
 
+            treeGroup = new THREE.Group();
+            scene.add(treeGroup);
+
             window.addEventListener('resize', onWindowResize);
         }
 
@@ -143,8 +147,8 @@
 
         function buildSingleGroundTile() {
             // NW- und SO-Eckpunkt der Kachel in GPS
-            const nwGps = tileToGps(TILE_X, TILE_Y, TILE_ZOOM);
-            const seGps = tileToGps(TILE_X + 1, TILE_Y + 1, TILE_ZOOM);
+            const nwGps = tileToGps(tile_x, tile_y, tile_zoom);
+            const seGps = tileToGps(tile_x + 1, tile_y + 1, tile_zoom);
 
             // ... und in Szenenkoordinaten
             const nw = gpsTo3D(nwGps.lat, nwGps.lon);
@@ -156,7 +160,7 @@
             const cz = (nw.z + se.z) / 2;
 
             const tex = new THREE.TextureLoader().load(
-                `./osm_tiles/${TILE_ZOOM}/${TILE_X}/${TILE_Y}.png`
+                `./osm_tiles/${tile_zoom}/${tile_x}/${tile_y}.png`
             );
             tex.colorSpace = THREE.SRGBColorSpace;
 
@@ -250,7 +254,40 @@
 
             updateStatus({ nwGps, seGps, nw, se, width, height, cx, cz });
         }
-		
+
+        // ====================================================================
+        // REFERENZBÄUME (Zylinder-Stamm + grüne Kugel als Krone)
+        // ====================================================================
+
+        function addNode(lat, lon, name) {
+            const pos = gpsTo3D(lat, lon);
+
+            // Vorgaben: 4 m Höhe, 30 cm Stammumfang (U = 2*pi*r  =>  r = U / (2*pi))
+            const trunkHeight = 4.0;
+            const circumference = 0.30;
+            const trunkRadius = circumference / (2 * Math.PI); // ≈ 0.0477 m
+
+            const tree = new THREE.Group();
+
+            const trunkGeo = new THREE.CylinderGeometry(trunkRadius, trunkRadius, trunkHeight, 8);
+            const trunkMat = new THREE.MeshBasicMaterial({ color: 0x78350f });
+            const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+            trunk.position.y = trunkHeight / 2; // Basis liegt auf y=0
+            tree.add(trunk);
+
+            const ballGeo = new THREE.SphereGeometry(0.5, 16, 16);
+            const ballMat = new THREE.MeshBasicMaterial({ color: 0x22c55e });
+            const ball = new THREE.Mesh(ballGeo, ballMat);
+            ball.position.y = trunkHeight; // sitzt auf der Stammspitze
+            tree.add(ball);
+
+            tree.position.set(pos.x, 0, pos.z);
+            tree.userData = { isTree: true, name, lat, lon };
+            treeGroup.add(tree);
+
+            return tree;
+        }
+
         function updateStatus(info) {
             const el = document.getElementById('status');
             el.innerText =
@@ -275,6 +312,12 @@ Ursprung (X=0,Z=0) = ${CENTER_LAT.toFixed(6)}, ${CENTER_LON.toFixed(6)}`;
         window.addEventListener('load', () => {
             initThreeJS();
             buildArrayGroundTiles();
+
+            // Baum Referenz
+            addNode(50.9184243, 6.9601182, "Baum 1");
+            addNode(50.9185121, 6.9606832, "Baum 2");
+            addNode(50.9184706, 6.9608173, "Baum 3");
+
             animate();
         });
     </script>
