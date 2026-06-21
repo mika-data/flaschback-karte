@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>MVP 2.5D Event-Planer</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: sans-serif; background: #f0f0f0; }
+        #canvas-container { width: 100vw; height: 100vh; }
+        #controls { position: absolute; top: 10px; left: 10px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10; }
+        #infobox { position: absolute; bottom: 20px; right: 20px; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: none; max-width: 300px; z-index: 10; }
+        button { cursor: pointer; padding: 6px 12px; margin-top: 5px; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        select { padding: 5px; margin-top: 5px; width: 100%; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <div id="controls">
+        <h3>Event CMS Admin</h3>
+        <label><input type="checkbox" id="edit-mode"> **Bearbeitungs-Modus**</label>
+        <div id="editor-tools" style="display:none; margin-top: 10px;">
+            <label for="item-type">Objekt-Typ:</label>
+            <select id="item-type">
+                <option value="bude">Verkaufsbude / Stand</option>
+                <option value="toilette">Toilettenwagen</option>
+                <option value="muell">Wertstofftonne</option>
+                <option value="hotspot">Info-Hotspot</option>
+            </select>
+            <button id="save-btn">Layout speichern</button>
+        </div>
+    </div>
+
+    <div id="infobox">
+        <h4 id="info-title">Titel</h4>
+        <p id="info-text">Inhalt</p>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script>
+        // --- 1. Szene & Isometrische Kamera Setup ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xe0e0e0);
+
+        // Orthografische Kamera für den typischen 2.5D SimCity-Look
+        const aspect = window.innerWidth / window.innerHeight;
+        const d = 30; 
+        const camera = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 1, 1000);
+        
+        // Isometrischer Winkel
+        camera.position.set(40, 40, 40);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableRotate = true; // Erlaubt das Drehen in der 3D-Ansicht
+
+        // --- Beleuchtung ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        dirLight.position.set(20, 40, 20);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+
+        // Bodenplatte (Simulierte Straße)
+        const planeGeo = new THREE.PlaneGeometry(200, 200);
+        const planeMat = new THREE.MeshStandardMaterial({ color: 0xd0d0d0 });
+        const terrain = new THREE.Mesh(planeGeo, planeMat);
+        terrain.rotation.x = -Math.PI / 2;
+        terrain.receiveShadow = true;
+        scene.add(terrain);
+
+        // --- 2. Daten-Parsing & Gebäude-Extrusion ---
+        let scaleFactor = 0.005; // Skalierung für F4-Map-Koordinaten ins Three.js-Grid
+
+        function parseF4Way(wayStr) {
+            const matches = wayStr.match(/P\(\((.*?)\)\)/);
+            if (!matches) return null;
+            const points = matches[1].split(',');
+            const shape = new THREE.Shape();
+            
+            points.forEach((p, index) => {
+                const coords = p.trim().split(' ').map(Number);
+                // Transformation um ein lokales Zentrum (grobe Zentrierung für den MVP)
+                const x = (coords[0] - 1000) * scaleFactor;
+                const z = (coords[1] - 1000) * scaleFactor;
+                if (index === 0) shape.moveTo(x, z);
+                else shape.lineTo(x, z);
+            });
+            return shape;
+        }
+
+        // OSM Gebäude laden und rendern
+        fetch('/api/osm')
+            .then(res => res.json())
+            .then(buildings => {
+                buildings.forEach(b => {
+                    if (!b.way) return;
+                    const shape = parseF4Way(b.way);
+                    if (!shape) return;
+
+                    const levels = b["building:levels"] || 3;
+                    const height = levels * 2.5; // 2.5 Einheiten Höhe pro Etage
+
+                    const extrudeSettings = { depth: height, bevelEnabled: false };
+                    const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                    
+                    // Drehung, da Extrusion standardmäßig auf der Z-Achse nach oben geht
+                    geometry.rotateX(-Math.PI / 2);
+
+                    const material = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.7 });
+                    const mesh = new THREE.Mesh(geometry, material);
+                    mesh.castShadow = true;
+                    mesh.receiveShadow = true;
+                    scene.add(mesh);
+                });
+            });
+
+        // --- 3. CMS & Dynamische Infrastruktur ---
+        let placedItems = [];
+        const itemColors = { bude: 0xffa500, toilette: 0x0000ff, muell: 0x00ff00, hotspot: 0xff00ff };
+
+        function createItemMesh(type, x, z) {
+            let geo;
+            if(type === 'hotspot') geo = new THREE.SphereGeometry(0.8, 16, 16);
+            else geo = new THREE.BoxGeometry(1.5, type === 'toilette' ? 2 : 1.2, 1.5);
+
+            const mat = new THREE.MeshStandardMaterial({ color: itemColors[type] });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x, geo.parameters.height ? geo.parameters.height/2 : 0.8, z);
+            mesh.castShadow = true;
+            mesh.userData = { type: type, isEventItem: true };
+            scene.add(mesh);
+            return mesh;
+        }
+
+        // Bestehende Platzierungen aus CMS laden
+        function loadPlacedItems() {
+            fetch('/api/items')
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(item => {
+                        const mesh = createItemMesh(item.type, item.x, item.z);
+                        mesh.userData.title = item.title;
+                        mesh.userData.text = item.text;
+                        placedItems.push(mesh);
+                    });
+                });
+        }
+        loadPlacedItems();
+
+        // --- 4. Interaktion & Raycasting (Klick & Mouse-Over) ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let isEditMode = false;
+
+        document.getElementById('edit-mode').addEventListener('change', (e) => {
+            isEditMode = e.target.checked;
+            document.getElementById('editor-tools').style.display = isEditMode ? 'block' : 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            // Ignoriere Klicks auf UI-Overlays
+            if (event.target.tagName === 'BUTTON' || event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT') return;
+
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+
+            if (isEditMode) {
+                // Objekt im Admin-Modus platzieren
+                const intersects = raycaster.intersectObject(terrain);
+                if (intersects.length > 0) {
+                    const p = intersects[0].point;
+                    const type = document.getElementById('item-type').value;
+                    
+                    const title = prompt("Titel für dieses Element:");
+                    const text = prompt("Beschreibung / Dokumentation:");
+
+                    const mesh = createItemMesh(type, p.x, p.z);
+                    mesh.userData.title = title;
+                    mesh.userData.text = text;
+                    placedItems.push(mesh);
+                }
+            } else {
+                // Info im Betrachtungs-Modus öffnen
+                const intersects = raycaster.intersectObjects(scene.children, true);
+                const clickedItem = intersects.find(i => i.object.userData.isEventItem);
+                
+                const infobox = document.getElementById('infobox');
+                if (clickedItem) {
+                    document.getElementById('info-title').innerText = clickedItem.object.userData.title || "Event-Objekt";
+                    document.getElementById('info-text').innerText = clickedItem.object.userData.text || "Keine Details hinterlegt.";
+                    infobox.style.display = 'block';
+                } else {
+                    infobox.style.display = 'none';
+                }
+            }
+        });
+
+        // CMS-Daten an Backend senden
+        document.getElementById('save-btn').addEventListener('click', () => {
+            const payload = placedItems.map(item => ({
+                type: item.userData.type,
+                x: item.position.x,
+                z: item.position.z,
+                title: item.userData.title,
+                text: item.userData.text
+            }));
+
+            fetch('/api/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(res => res.json()).then(res => alert("Event-Layout erfolgreich gespeichert!"));
+        });
+
+        // --- Render Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Fenstergröße anpassen
+        window.addEventListener('resize', () => {
+            const aspect = window.innerWidth / window.innerHeight;
+            camera.left = -d * aspect;
+            camera.right = d * aspect;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

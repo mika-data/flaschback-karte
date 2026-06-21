@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLÄSCHBÄCK – Geo-Engine Debugger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        .debug-font { font-family: "Consolas", monospace; }
+        .marquee { white-space: nowrap; overflow: hidden; }
+        .marquee span { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+    </style>
+</head>
+<body class="bg-slate-900 text-white font-sans h-screen flex flex-col">
+
+    <!-- STATUSZEILE -->
+    <div class="debug-font bg-black text-emerald-400 p-2 text-xs border-b border-emerald-800 flex items-center justify-between">
+        <div class="marquee w-2/3"><span>&gt;_ STATUS: <span id="dbg-info">Lade Kartendaten...</span></span></div>
+        <div class="w-1/3 text-right" id="dbg-coords">GPS: -- | X: 0, Z: 0</div>
+    </div>
+
+    <div class="flex-grow relative">
+        <div id="canvas-container" class="absolute inset-0"></div>
+        
+        <!-- DEBUG-PANEL -->
+        <div class="absolute top-4 left-4 bg-slate-800/90 p-4 rounded-xl border border-slate-600 w-80 text-xs">
+            <h2 class="font-bold text-amber-400 mb-2">GIS-Daten-Debugger</h2>
+            <div id="config-params" class="space-y-2">
+                <button onclick="copyToClipboard()" class="w-full bg-emerald-600 py-2 rounded text-white font-bold">Parameter kopieren (JSON)</button>
+                <textarea id="json-output" class="w-full h-20 bg-black text-emerald-300 p-2 rounded text-[10px]" readonly></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CENTER_LAT = 50.9184;
+        const CENTER_LON = 6.9604;
+        const R = 6378137;
+
+        function gpsToXY(lat, lon) {
+            const x = R * lon * Math.PI / 180;
+            const y = R * Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI / 180) / 2));
+            return { x, y };
+        }
+
+        const center = gpsToXY(CENTER_LAT, CENTER_LON);
+
+        let scene, camera, renderer, controls;
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.position.set(20, 40, 20);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            
+            // Bodenkachel
+            const tex = new THREE.TextureLoader().load('https://tile.openstreetmap.org/18/136140/87854.png');
+            const ground = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshBasicMaterial({map: tex}));
+            ground.rotation.x = -Math.PI/2;
+            scene.add(ground);
+
+            // Baum Referenz
+            addNode(50.9184243, 6.9601182, "Baum 1");
+            addNode(50.9185121, 6.9606832, "Baum 2");
+            addNode(50.9184706, 6.9608173, "Baum 3");
+
+            animate();
+        }
+
+        function addNode(lat, lon, name) {
+            const pos = gpsToXY(lat, lon);
+            const x = pos.x - center.x;
+            const z = -(pos.y - center.y);
+            const geo = new THREE.CylinderGeometry(0.1, 0.1, 4);
+            const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({color: 0x00ff00}));
+            mesh.position.set(x, 2, z);
+            scene.add(mesh);
+        }
+
+        function copyToClipboard() {
+            const data = { centerLat: CENTER_LAT, centerLon: CENTER_LON };
+            navigator.clipboard.writeText(JSON.stringify(data));
+            document.getElementById('dbg-info').innerText = "Parameter in Zwischenablage!";
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        init();
+    </script>
+</body>
+</html>

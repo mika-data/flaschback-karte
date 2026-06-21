@@ -1,0 +1,17 @@
+[
+    {
+        "text": "In dieser sogenannten Event-Tonne wurden hauptsächlich gemischte Abfälle entsorgt. Laut Beschriftung sollen auch Glas-Flaschen hier entsorgt werden. Das ist also eine Misch-Tonne für Altglas und Restmüll.",
+        "title": "Orangene Event-Tonne",
+        "type": "muell",
+        "x": -6.446320740212148,
+        "z": 3.9702404306747496
+    },
+    {
+        "id": "item_1781982699132",
+        "type": "bude",
+        "x": -9.7,
+        "z": 4.86,
+        "title": "Pommesbude \"Rot-Weiß\"",
+        "text": "In dieser Pommesbude wurden hauptsächlich Lebensmittel auf Einweg-Pappschalen verkauft. Diese haben in dieser Umgebung viel Einwegmüll produziert. Fehlwürfe in diesem Bereich waren vorprogrammiert. Gäste glaube, dass Pappschalen mit Pommesfett und Ketchup-Resten noch im Papierrecycling verarbeitet werden können und werfen es meistens in den Papiercontainer."
+    }
+]

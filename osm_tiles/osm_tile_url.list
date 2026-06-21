@@ -1,0 +1,25 @@
+Use the correct URL: 
+https://tile.openstreetmap.org/{z}/{x}/{y}.png
+
+Z (Zoom): Represents the zoom level. A value of 0 shows the entire world on a single tile, while higher numbers zoom in closer (e.g., zoom level 19 shows individual buildings). At zoom level z, the total map is a grid of \(2^z \times 2^z\) tiles.
+
+X (Column): Represents the horizontal position. It starts at 0 on the 180° meridian (west) and counts up as you move east.
+
+Y (Row): Represents the vertical position. It starts at 0 at the northernmost edge of the map and counts down as you move south
+
+https://tile.openstreetmap.org/19/272280/175708.png
+https://tile.openstreetmap.org/19/272280/175707.png
+https://tile.openstreetmap.org/19/272279/175708.png
+https://tile.openstreetmap.org/19/272281/175708.png
+https://tile.openstreetmap.org/19/272280/175709.png
+https://tile.openstreetmap.org/19/272279/175707.png
+https://tile.openstreetmap.org/19/272281/175707.png
+https://tile.openstreetmap.org/19/272279/175709.png
+https://tile.openstreetmap.org/19/272281/175709.png
+https://tile.openstreetmap.org/19/272280/175706.png
+https://tile.openstreetmap.org/19/272280/175710.png
+https://tile.openstreetmap.org/19/272279/175706.png
+https://tile.openstreetmap.org/19/272281/175706.png
+https://tile.openstreetmap.org/19/272279/175710.png
+https://tile.openstreetmap.org/19/272281/175710.png
+https://tile.openstreetmap.org/19/272280/175709.png

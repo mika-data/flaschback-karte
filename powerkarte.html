@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLÄSCHBÄCK – Projektdokumentation Südstadtfest & ColognePride</title>
+    
+    <!-- Tailwind CSS für erstklassiges UI-Design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons für moderne Symbole -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Three.js & OrbitControls für die interaktive 2.5D Karte -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <style>
+        /* Sanfte Scrollbalken für ein premium Look & Feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Pulsierender Effekt für aktive Info-Hotspots */
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.15); opacity: 1; filter: brightness(1.2); }
+        }
+        .pulse-marker {
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-emerald-600 text-white p-2 rounded-lg shadow-md flex items-center justify-center">
+                    <i data-lucide="recycle" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <span class="font-bold text-lg tracking-tight text-slate-900">FLÄSCHBÄCK</span>
+                    <span class="text-xs block text-emerald-600 font-semibold tracking-wider uppercase">Initiative Kreislaufwirtschaft Köln</span>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex space-x-1 text-sm font-medium">
+                <button onclick="scrollToSection('hero')" class="px-3 py-2 text-slate-600 hover:text-emerald-600 rounded-md transition-colors">Übersicht</button>
+                <button onclick="scrollToSection('case-study')" class="px-3 py-2 text-slate-600 hover:text-emerald-600 rounded-md transition-colors">Reallabor-Karte</button>
+                <button onclick="scrollToSection('documentation')" class="px-3 py-2 text-slate-600 hover:text-emerald-600 rounded-md transition-colors">Projektdokumentation</button>
+                <button onclick="scrollToSection('funder-pitch')" class="px-3 py-2 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-md transition-colors font-semibold">Förderantrag 2026</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow">
+        
+        <!-- HERO / KEY METRICS -->
+        <section id="hero" class="relative bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white py-16 px-4 overflow-hidden">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.1),transparent)] pointer-events-none"></div>
+            <div class="max-w-7xl mx-auto relative z-10">
+                <div class="grid md:grid-cols-12 gap-8 items-center">
+                    <div class="md:col-span-7 space-y-6">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-ping"></span>
+                            Pilotprojekt erfolgreich abgeschlossen
+                        </span>
+                        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight leading-none text-white">
+                            Wertstoffrettung auf Großveranstaltungen
+                        </h1>
+                        <p class="text-slate-300 text-lg leading-relaxed max-w-2xl">
+                            Unsere Initiative bündelt ehrenamtliches Engagement und zirkuläre Logistikkonzepte, um wertvolle Glasressourcen vor der thermischen Verwertung (Müllverbrennung) zu retten, städtische Reinigungskosten zu senken und das Verletzungsrisiko durch Glasbruch signifikant zu minimieren.
+                        </p>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="scrollToSection('case-study')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-emerald-900/20 transition-all flex items-center space-x-2">
+                                <span>Reallabor-Karte starten</span>
+                                <i data-lucide="map" class="w-5 h-5"></i>
+                            </button>
+                            <button onclick="scrollToSection('documentation')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold px-6 py-3 rounded-lg transition-all flex items-center space-x-2">
+                                <span>Projektdokumentation</span>
+                                <i data-lucide="file-text" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- KEY PERFORMANCE INDICATORS -->
+                    <div class="md:col-span-5 grid grid-cols-2 gap-4">
+                        <div class="bg-slate-800/80 border border-slate-700/50 backdrop-blur-sm p-5 rounded-xl shadow-xl">
+                            <div class="text-emerald-400 font-bold text-3xl md:text-4xl">2.150+</div>
+                            <div class="text-xs uppercase tracking-wider text-slate-400 mt-1 font-semibold">Gerettete Flaschen</div>
+                            <p class="text-slate-300 text-xs mt-2">Erfolgreich in den Mehrweg-Kreislauf zurückgeführt.</p>
+                        </div>
+                        <div class="bg-slate-800/80 border border-slate-700/50 backdrop-blur-sm p-5 rounded-xl shadow-xl">
+                            <div class="text-emerald-400 font-bold text-3xl md:text-4xl">1,2 t</div>
+                            <div class="text-xs uppercase tracking-wider text-slate-400 mt-1 font-semibold">CO₂-Einsparung</div>
+                            <p class="text-slate-300 text-xs mt-2">Durch Vermeidung von energieintensiver Neuproduktion.</p>
+                        </div>
+                        <div class="bg-slate-800/80 border border-slate-700/50 backdrop-blur-sm p-5 rounded-xl shadow-xl">
+                            <div class="text-emerald-400 font-bold text-3xl md:text-4xl">500 €+</div>
+                            <div class="text-xs uppercase tracking-wider text-slate-400 mt-1 font-semibold">Pfandspenden</div>
+                            <p class="text-slate-300 text-xs mt-2">Für städtische Umwelt- und Aufforstungsprojekte.</p>
+                        </div>
+                        <div class="bg-slate-800/80 border border-slate-700/50 backdrop-blur-sm p-5 rounded-xl shadow-xl">
+                            <div class="text-emerald-400 font-bold text-3xl md:text-4xl">100%</div>
+                            <div class="text-xs uppercase tracking-wider text-slate-400 mt-1 font-semibold">Sicherheitszuwachs</div>
+                            <p class="text-slate-300 text-xs mt-2">Keine gemeldeten Schnittverletzungen im Einsatzgebiet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERAKTIVES REALLABOR / THREE.JS MAP & MINI-CMS -->
+        <section id="case-study" class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Interaktive Reallabor-Dokumentation</h2>
+                    <p class="text-slate-500 text-sm">Visualisierung des Pilotprojekts am Südstadtfest (Bonner Straße, Köln). Klicken Sie auf Hotspots oder schalten Sie das CMS zur Planung frei.</p>
+                </div>
+                
+                <!-- CONTROL PANEL METRICS -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <button id="btn-view-mode" onclick="setMapMode('view')" class="px-4 py-2 rounded-lg font-semibold text-sm transition-all flex items-center space-x-2 bg-emerald-600 text-white shadow-md">
+                        <i data-lucide="eye" class="w-4 h-4"></i>
+                        <span>Förderer-Ansicht</span>
+                    </button>
+                    <button id="btn-admin-mode" onclick="setMapMode('admin')" class="px-4 py-2 rounded-lg font-semibold text-sm transition-all flex items-center space-x-2 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50">
+                        <i data-lucide="pencil" class="w-4 h-4"></i>
+                        <span>Admin-Planungs-CMS</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- THE INTERACTIVE MAP WRAPPER -->
+            <div class="grid lg:grid-cols-12 gap-6 bg-white border border-slate-200 rounded-2xl shadow-lg overflow-hidden h-[650px]">
+                
+                <!-- THREE.JS CONTAINER -->
+                <div class="lg:col-span-8 relative h-full bg-slate-100 flex flex-col">
+                    
+                    <!-- Loader Spinner -->
+                    <div id="map-loader" class="absolute inset-0 bg-slate-100 flex flex-col items-center justify-center z-20 transition-opacity duration-500">
+                        <div class="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span class="mt-4 text-sm font-semibold text-slate-600">3D-Gelände Bonner Straße wird berechnet...</span>
+                    </div>
+
+                    <!-- Mode Indicator Badge -->
+                    <div class="absolute top-4 left-4 z-10 flex items-center space-x-2">
+                        <span id="badge-mode" class="bg-emerald-600 text-white px-3 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-md flex items-center space-x-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                            <span id="badge-text">FÖRDERER-MODUS ACTIVE</span>
+                        </span>
+                        <span class="bg-slate-900/80 text-white px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm shadow-md flex items-center space-x-1.5">
+                            <i data-lucide="navigation-2" class="w-3.5 h-3.5 rotate-45"></i>
+                            <span>Isometrisch 2.5D</span>
+                        </span>
+                    </div>
+
+                    <!-- Orbit Controls Help Overlay -->
+                    <div class="absolute bottom-4 left-4 z-10 bg-slate-900/75 text-white p-2.5 rounded-lg text-xs font-medium max-w-xs backdrop-blur-sm pointer-events-none">
+                        <p class="flex items-center gap-1.5"><i data-lucide="move" class="w-3.5 h-3.5"></i> Gedrückte Maustaste + Bewegen dreht die Karte.</p>
+                        <p class="flex items-center gap-1.5 mt-1"><i data-lucide="mouse-pointer" class="w-3.5 h-3.5"></i> Klick auf farbige Objekte öffnet Detailkarten.</p>
+                    </div>
+
+                    <!-- Actual 3D Canvas -->
+                    <div id="canvas-container" class="w-full flex-grow h-full outline-none"></div>
+                </div>
+
+                <!-- CMS & INFORMATION PANEL -->
+                <div class="lg:col-span-4 flex flex-col h-full bg-slate-50 border-l border-slate-200">
+                    
+                    <!-- Header -->
+                    <div class="p-4 bg-white border-b border-slate-200 flex items-center justify-between">
+                        <h3 class="font-bold text-slate-800 flex items-center space-x-2">
+                            <i data-lucide="info" class="w-5 h-5 text-emerald-600"></i>
+                            <span id="sidebar-panel-title">Objekt-Details</span>
+                        </h3>
+                        <span class="text-xs text-slate-400 font-medium" id="panel-state">Bereit</span>
+                    </div>
+
+                    <!-- Panel Content Body -->
+                    <div class="flex-grow overflow-y-auto p-4 space-y-4">
+                        
+                        <!-- VIEW MODE: Dynamic Info Display -->
+                        <div id="view-panel" class="space-y-4">
+                            <div id="view-empty-state" class="text-center py-12 px-4">
+                                <div class="bg-slate-100 text-slate-400 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i data-lucide="mouse-pointer-click" class="w-8 h-8"></i>
+                                </div>
+                                <h4 class="font-bold text-slate-700">Klicken Sie ein Objekt an</h4>
+                                <p class="text-slate-500 text-xs mt-2 leading-relaxed">
+                                    Wählen Sie ein farbiges Infrastruktur- oder Hotspot-Element auf der Karte aus, um reale Daten, Fotos, Kommentare und Lerneffekte der Reallabor-Initiative einzusehen.
+                                </p>
+                            </div>
+
+                            <div id="view-content" class="hidden space-y-4">
+                                <div id="view-badge-type" class="inline-block text-[10px] font-bold tracking-widest uppercase px-2 py-1 rounded bg-slate-200 text-slate-700">HOTSPOT</div>
+                                <h4 id="view-title" class="text-lg font-bold text-slate-900 leading-snug">Station Name</h4>
+                                <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-sm text-slate-600 space-y-3 leading-relaxed">
+                                    <p id="view-description">Objektbeschreibung.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ADMIN/CMS PLANER MODE: Editor Fields -->
+                        <div id="admin-panel" class="hidden space-y-4">
+                            <div class="bg-yellow-50 border border-yellow-200 p-3 rounded-lg text-xs text-yellow-800 leading-relaxed">
+                                <strong>Planungs-Modus:</strong> Klicken Sie auf eine beliebige Stelle auf dem Straßenfest-Gelände, um ein neues Infrastruktur-Element hinzuzufügen, oder wählen Sie ein bestehendes aus, um es zu editieren.
+                            </div>
+
+                            <form id="cms-form" onsubmit="saveCurrentItem(event)" class="space-y-3">
+                                <input type="hidden" id="edit-item-id">
+                                <input type="hidden" id="edit-item-x">
+                                <input type="hidden" id="edit-item-z">
+                                
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1">Infrastruktur-Typ</label>
+                                    <select id="edit-item-type" onchange="updateFormDefaults()" class="w-full text-sm bg-white border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-emerald-600">
+                                        <option value="zelt">Zeltbasis / Logistik-Zentrum (Weiß)</option>
+                                        <option value="bude">Verkaufsbude / Street-Food (Orange)</option>
+                                        <option value="muell">Wertstoff-Sammelstation (Grün)</option>
+                                        <option value="toilette">Toilettenwagen / Sanitär (Blau)</option>
+                                        <option value="hotspot">Gefahrenpunkt / Lerneffekt (Rot)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1">Bezeichnung / Titel</label>
+                                    <input type="text" id="edit-item-title" required placeholder="z. B. Logistikzentrum Bonner Str." class="w-full text-sm bg-white border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-emerald-600">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1">Dokumentation / Beschreibung</label>
+                                    <textarea id="edit-item-desc" rows="5" required placeholder="Zentrale Koordination der ehrenamtlichen Kräfte, Ausgabe von T-Shirts, Bollerwagen und Handschuhen." class="w-full text-sm bg-white border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-emerald-600"></textarea>
+                                </div>
+
+                                <div class="pt-2 flex gap-2">
+                                    <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold py-2 rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow">
+                                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                        <span>Übernehmen</span>
+                                    </button>
+                                    <button type="button" id="btn-delete" onclick="deleteCurrentItem()" class="hidden bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-sm font-semibold px-3 py-2 rounded-lg transition-colors">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Footer: Save & JSON Export -->
+                    <div class="p-4 bg-white border-t border-slate-200 space-y-2">
+                        <button onclick="saveLayoutToDatabase()" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            <span>Layout permanent speichern</span>
+                        </button>
+                        <div class="flex items-center justify-between text-[11px] text-slate-400">
+                            <span>Sicherung via API oder LocalStorage</span>
+                            <button onclick="toggleJsonConfigPanel()" class="text-emerald-600 font-semibold hover:underline">JSON Konfiguration</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JSON CONFIGURATION BOX PANEL (HIDDEN BY DEFAULT) -->
+            <div id="json-panel" class="hidden mt-4 bg-slate-900 text-slate-300 p-4 rounded-xl shadow-lg border border-slate-700/50 space-y-3">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-xs font-bold uppercase text-emerald-400 tracking-wider">JSON Export/Import für items.json</h4>
+                    <button onclick="toggleJsonConfigPanel()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+                </div>
+                <p class="text-[11px] leading-relaxed text-slate-400">
+                    Kopieren Sie dieses JSON-Array und fügen Sie es in Ihre Serverdatei <code>items.json</code> ein, oder importieren Sie bestehende Layouts direkt hier.
+                </p>
+                <textarea id="json-io-area" rows="6" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 font-mono text-xs text-emerald-300 focus:outline-none"></textarea>
+                <div class="flex justify-end gap-2">
+                    <button onclick="importJsonConfig()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 py-1.5 rounded-md transition-colors">Importieren</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROJEKTDOKUMENTATION (REALLABOR SÜDSTADTFEST) -->
+        <section id="documentation" class="py-16 bg-slate-100 border-t border-b border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-3xl mx-auto text-center mb-12">
+                    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Projektdokumentation Reallabor Südstadtfest</h2>
+                    <p class="text-slate-600 text-md mt-2 leading-relaxed">
+                        Ein strukturiertes Evaluierungsdokument für Fördermittelgeber, öffentliche Institutionen und strategische Partner zur Verprobung zirkulärer Wertstoffströme im urbanen Raum.
+                    </p>
+                </div>
+
+                <!-- TABS SYSTEM -->
+                <div class="bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
+                    <div class="border-b border-slate-200 bg-slate-50 flex flex-wrap overflow-x-auto">
+                        <button onclick="switchTab('tab-concept')" id="btn-tab-concept" class="tab-button border-b-2 border-emerald-600 text-emerald-600 px-6 py-4 text-sm font-bold tracking-wide uppercase transition-all flex items-center space-x-2">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            <span>Ökologisches Konzept</span>
+                        </button>
+                        <button onclick="switchTab('tab-ops')" id="btn-tab-ops" class="tab-button border-b-2 border-transparent text-slate-500 hover:text-slate-700 px-6 py-4 text-sm font-bold tracking-wide uppercase transition-all flex items-center space-x-2">
+                            <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+                            <span>Operativer Ablauf</span>
+                        </button>
+                        <button onclick="switchTab('tab-financials')" id="btn-tab-financials" class="tab-button border-b-2 border-transparent text-slate-500 hover:text-slate-700 px-6 py-4 text-sm font-bold tracking-wide uppercase transition-all flex items-center space-x-2">
+                            <i data-lucide="line-chart" class="w-4 h-4"></i>
+                            <span>Finanzielle Bilanz & Impact</span>
+                        </button>
+                        <button onclick="switchTab('tab-learnings')" id="btn-tab-learnings" class="tab-button border-b-2 border-transparent text-slate-500 hover:text-slate-700 px-6 py-4 text-sm font-bold tracking-wide uppercase transition-all flex items-center space-x-2">
+                            <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                            <span>Lerneffekte & Optimierung</span>
+                        </button>
+                    </div>
+
+                    <div class="p-6 md:p-8 space-y-6">
+                        
+                        <!-- TAB: ÖKOLOGISCHES KONZEPT -->
+                        <div id="tab-concept" class="tab-content space-y-6">
+                            <div class="grid md:grid-cols-12 gap-6 items-center">
+                                <div class="md:col-span-7 space-y-4">
+                                    <h3 class="text-2xl font-bold text-slate-900 leading-tight">Das ungenutzte Potenzial: Warum Glasverschwendung vermeidbar ist</h3>
+                                    <p class="text-slate-600 leading-relaxed text-sm">
+                                        Der Großteil des Glases, das im Rahmen von städtischen Großveranstaltungen (wie z.B. Straßenfesten oder Paraden) weggeworfen wird, landet unweigerlich in herkömmlichen Event-Tonnen. Dies führt zu einem signifikanten ökologischen und wirtschaftlichen Problem: **Mehrwegglas-Flaschen werden zerstört, ungetrennt mit dem Restmüll verbrannt** und gehen dem stofflichen Kreislauf dauerhaft verloren.
+                                    </p>
+                                    <p class="text-slate-600 leading-relaxed text-sm">
+                                        Die Verbrennung von intaktem Quarzglas erfordert massive thermische Energie bei unzureichendem Heizwert. Gleichzeitig entstehen enorme ökonomische Externalitäten: Städtische Betriebe (AWB) müssen tonnenweise verunreinigte Fraktionen unter hohem Kostenaufwand entsorgen, während die Entsorgungskosten für Veranstalter steigen.
+                                    </p>
+                                    <div class="border-l-4 border-emerald-500 bg-emerald-50 p-4 rounded-r-lg">
+                                        <p class="text-xs text-emerald-800 font-semibold leading-relaxed">
+                                            "Unsere Kernvision ist der lückenlose Erhalt des zirkulären Kreislaufs: Durch die dezentrale, vorsortierte Erfassung direkt am Point of Consumption reduzieren wir die Betriebskosten der Kommunen, entlasten Rettungsdienste durch Scherbenfreiheit und führen 100% des Materials in den Mehrwegkreislauf zurück."
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="md:col-span-5 bg-slate-50 border border-slate-200 p-6 rounded-2xl space-y-4 shadow-sm">
+                                    <h4 class="font-bold text-slate-800 text-sm tracking-wider uppercase">Vorteile auf einen Blick</h4>
+                                    <div class="space-y-3">
+                                        <div class="flex items-start space-x-3 text-xs text-slate-600">
+                                            <i data-lucide="check" class="text-emerald-600 w-5 h-5 flex-shrink-0 mt-0.5"></i>
+                                            <div><strong>Ressourcenerhalt:</strong> Mehrwegflaschen gehen zurück an die Brauereien, anstatt eingeschmolzen oder deponiert zu werden.</div>
+                                        </div>
+                                        <div class="flex items-start space-x-3 text-xs text-slate-600">
+                                            <i data-lucide="check" class="text-emerald-600 w-5 h-5 flex-shrink-0 mt-0.5"></i>
+                                            <div><strong>Sicherheit im Straßenraum:</strong> Massive Senkung von Schnittverletzungen für Besucher und Rettungskräfte.</div>
+                                        </div>
+                                        <div class="flex items-start space-x-3 text-xs text-slate-600">
+                                            <i data-lucide="check" class="text-emerald-600 w-5 h-5 flex-shrink-0 mt-0.5"></i>
+                                            <div><strong>Kostenreduktion:</strong> Einsparung bei den städtischen Kehr- und thermischen Entsorgungskosten.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB: OPERATIVER ABLAUF -->
+                        <div id="tab-ops" class="tab-content hidden space-y-6">
+                            <h3 class="text-2xl font-bold text-slate-900">Strukturierter Ablaufplan (13. & 14. Juni)</h3>
+                            <p class="text-slate-600 leading-relaxed text-sm">
+                                Das Reallabor wurde als stationäre Sammelaktion an einem festen Veranstaltungsort durchgeführt (Südstadtfest Köln, Bonner Straße). Die logistischen Rollen waren klar strukturiert, um einen flüssigen Betrieb auch bei hohem Besucheraufkommen sicherzustellen.
+                            </p>
+                            
+                            <!-- TIMELINE & SCHICHTEN -->
+                            <div class="grid md:grid-cols-12 gap-6">
+                                <div class="md:col-span-6 space-y-4">
+                                    <h4 class="font-bold text-slate-800 text-xs tracking-wider uppercase">Zeitlicher Ablauf der Operation</h4>
+                                    <div class="space-y-3 font-mono text-xs">
+                                        <div class="flex items-center space-x-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                            <span class="text-emerald-600 font-bold">FR, 12:00</span>
+                                            <span class="text-slate-600">Aufbau Basis-Zelt & Materialtransport (Handschuhe, Bollerwagen, Kästen)</span>
+                                        </div>
+                                        <div class="flex items-center space-x-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                            <span class="text-emerald-600 font-bold">SA, 15:00</span>
+                                            <span class="text-slate-600">Eintreffen Kern-Orga (Claudia & Michael), Vorbereitung der ersten Bollerteams</span>
+                                        </div>
+                                        <div class="flex items-center space-x-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                            <span class="text-emerald-600 font-bold">SA, 17:00</span>
+                                            <span class="text-slate-600">Hauptsammelzeit (Kernsammelzeit 17-22 Uhr) direkt auf der Festmeile</span>
+                                        </div>
+                                        <div class="flex items-center space-x-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                            <span class="text-emerald-600 font-bold">SO, 17:00</span>
+                                            <span class="text-slate-600">Zweiter Einsatztag, kontinuierliche Sortierung und Kistenübergabe</span>
+                                        </div>
+                                        <div class="flex items-center space-x-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                            <span class="text-emerald-600 font-bold">SO, 23:59</span>
+                                            <span class="text-slate-600">Abbau und Transport des Restguts in das Logistiklager (Schmitz & Kunzt)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="md:col-span-6 space-y-4">
+                                    <h4 class="font-bold text-slate-800 text-xs tracking-wider uppercase">Operative Rollenprofile</h4>
+                                    <div class="grid grid-cols-2 gap-3 text-xs">
+                                        <div class="p-3 border border-slate-200 rounded-lg bg-white">
+                                            <strong class="text-slate-900 block mb-1">Zeltwache & Empfang</strong>
+                                            Koordination des Materials, Ehrenamts-Zuweisung und Begrüßung. (Besetzung: Michael, Fred)
+                                        </div>
+                                        <div class="p-3 border border-slate-200 rounded-lg bg-white">
+                                            <strong class="text-slate-900 block mb-1">Bollerteams</strong>
+                                            Aktive Glassammlung auf der Festmeile mittels geliehener Bollerwagen. (2-3 Personen pro Team)
+                                        </div>
+                                        <div class="p-3 border border-slate-200 rounded-lg bg-white">
+                                            <strong class="text-slate-900 block mb-1">Loader-Gruppe</strong>
+                                            Entgegennahme voller Kästen und Verladung, Ausgabe von frischen Leerkästen an Bollerteams.
+                                        </div>
+                                        <div class="p-3 border border-slate-200 rounded-lg bg-white">
+                                            <strong class="text-slate-900 block mb-1">Spende-dein-Pfand</strong>
+                                            Überwachung der Restmülltonnen und Motivation der Festivalgäste zur Spende direkt am Point of Sale.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB: FINANZIELLE BILANZ -->
+                        <div id="tab-financials" class="tab-content hidden space-y-6">
+                            <h3 class="text-2xl font-bold text-slate-900">Transparente finanzielle Evaluierung</h3>
+                            <p class="text-slate-600 leading-relaxed text-sm">
+                                Um den systemischen Mehrwert zu belegen, legen wir alle Einnahmen und Ausgaben transparent offen. Das Reallabor hat gezeigt, dass die Deckung der Sachkosten im Rahmen eines Pilotprojekts ohne feste Förderung zwar herausfordernd ist, der geschaffene soziale und ökologische Impact dies jedoch massiv überwiegt.
+                            </p>
+
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <!-- EINNAHMEN-TABELLE -->
+                                <div class="space-y-3">
+                                    <h4 class="font-bold text-slate-800 text-xs tracking-wider uppercase flex items-center justify-between">
+                                        <span>Projekt-Einnahmen & Spenden</span>
+                                        <span class="text-emerald-600 font-mono text-xs">Gesamt: ca. 247,02 €</span>
+                                    </h4>
+                                    <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                                        <table class="w-full text-xs text-left">
+                                            <thead class="bg-slate-50 border-b border-slate-200 font-semibold text-slate-700">
+                                                <tr>
+                                                    <th class="p-3">Position</th>
+                                                    <th class="p-3 text-right">Betrag</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-slate-100 font-mono">
+                                                <tr>
+                                                    <td class="p-3">Einwegpfand (Dosen, PET) – geschätzt</td>
+                                                    <td class="p-3 text-right text-emerald-600">+ 52,00 €</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="p-3">Pfand-Becher (Veranstalter) – geschätzt</td>
+                                                    <td class="p-3 text-right text-emerald-600">+ 35,00 €</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="p-3">Direkte Pfandspenden vor Ort</td>
+                                                    <td class="p-3 text-right text-emerald-600">+ 5,02 €</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="p-3">T-Shirt-Sonderverkauf (2 Stk.)</td>
+                                                    <td class="p-3 text-right text-emerald-600">+ 10,00 €</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="p-3">Mehrwegpfand-Ertrag (Flaschen)</td>
+                                                    <td class="p-3 text-right text-emerald-600">+ 150,00 €</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-lg border border-emerald-100 leading-relaxed">
+                                        <strong>Mittelverwendung:</strong> Alle Pfanderlöse und Spenden wurden zu 100% städtischen Umweltprojekten (z.B. Schutzgemeinschaft Deutscher Wald Köln, Projekt "6. Wald für Köln") sowie Bildungsprojekten für Kölner Kindergärten zur Verfügung gestellt.
+                                    </div>
+                                </div>
+
+                                <!-- AUSGABEN-TABELLE -->
+                                <div class="space-y-3">
+                                    <h4 class="font-bold text-slate-800 text-xs tracking-wider uppercase flex items-center justify-between">
+                                        <span>Projektbezogene Aufwendungen</span>
+                                        <span class="text-rose-600 font-mono text-xs">Gesamtinvest: ca. 394,20 €</span>
+                                    </h4>
+                                    <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                                        <table class="w-full text-xs text-left">
+                                            <thead class="bg-slate-50 border-b border-slate-200 font-semibold text-slate-700">
+                                                <tr>
+                                                    <th class="p-3">Position / Sachleistung</th>
+                                                    <th class="p-3 text-right">Kosten</th>
+                                                    <th class="p-3">Gestellt durch</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-slate-100 font-mono">
+                                                <tr>
+                                                    <td class="p-3">Leihgut-Kommission (120x Leergutkästen)</td>
+                                                    <td class="p-3 text-right">214,20 €</td>
+                                                    <td class="p-3">Die Feiermacher</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="p-3">Stickerdruck (Branding/Verlustweg)</td>
+                                                    <td class="p-3 text-right">130,00 €</td>
+                                                    <td class="p-3">Michael Cieslik</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="p-3">Zusatz-Logistik (Pappkartons, Ersatzschlüssel)</td>
+                                                    <td class="p-3 text-right">18,00 €</td>
+                                                    <td class="p-3">Michael Cieslik</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="p-3">Spende Obdachlosenhilfe (Dennis Koop.)</td>
+                                                    <td class="p-3 text-right">30,00 €</td>
+                                                    <td class="p-3">Michael Cieslik</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="p-3">Desinfektionsspray & Reinigung</td>
+                                                    <td class="p-3 text-right">2,00 €</td>
+                                                    <td class="p-3">Initiative</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="p-3 bg-slate-50 text-slate-500 text-[10px] rounded-lg border border-slate-200 leading-relaxed">
+                                        <strong>Hinweis zum Seed-Investment:</strong> Die Differenz der ungedeckten Sachkosten von ca. 200,00 € sowie ein ehrenamtlicher Arbeitsausfall von ca. 400,00 € wurde von den Initiatoren als privates Seed-Investment eingebracht. Dies demonstriert das enorme persönliche Engagement zur Validierung des Kreislauf-Modells.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB: LERNEFFEKTE -->
+                        <div id="tab-learnings" class="tab-content hidden space-y-6">
+                            <h3 class="text-2xl font-bold text-slate-900">Operative Evaluierung & Lerneffekte</h3>
+                            <p class="text-slate-600 leading-relaxed text-sm">
+                                Um eine Skalierung des Reallabors auf Großveranstaltungen wie den ColognePride 2026 erfolgreich durchzuführen, wurden während der Pilotphase am Südstadtfest wesentliche logistische und strukturelle Lerneffekte erfasst und in Handlungsbedarfe übersetzt:
+                            </p>
+
+                            <div class="grid md:grid-cols-2 gap-6 text-xs">
+                                <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
+                                    <h4 class="font-bold text-slate-900 flex items-center space-x-2">
+                                        <i data-lucide="shield-alert" class="w-4.5 h-4.5 text-amber-500"></i>
+                                        <span>Herausforderung: Logistische Absicherung</span>
+                                    </h4>
+                                    <p class="text-slate-600 leading-relaxed">
+                                        <strong>Beobachtung:</strong> Da kein absperrbarer Lkw mit Hebebühne freigegeben wurde, mussten offene Bauzäune als Notlager genutzt werden. Dies führte zu vereinzelten Entwendungen von gesammelten Pfandkisten während der Nachtstunden.
+                                    </p>
+                                    <p class="text-emerald-700 bg-emerald-50 p-2 rounded border border-emerald-100">
+                                        <strong>Maßnahme:</strong> Für zukünftige Einsätze ist die Bereitstellung von rollbaren, abschließbaren Gitterboxen oder die Genehmigung eines festen 7,5t Lkw-Stellplatzes als mobiles Lager zwingend erforderlich.
+                                    </p>
+                                </div>
+
+                                <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
+                                    <h4 class="font-bold text-slate-900 flex items-center space-x-2">
+                                        <i data-lucide="users" class="w-4.5 h-4.5 text-blue-500"></i>
+                                        <span>Herausforderung: Lokale Pfandsammler-Strukturen</span>
+                                    </h4>
+                                    <p class="text-slate-600 leading-relaxed">
+                                        <strong>Beobachtung:</strong> Lokale, teils obdachlose Pfandsammler empfanden die Initiative vereinzelt als Konkurrenz. Einige Security-Kräfte verweigerten den Zugang zu Hauptflächen.
+                                    </p>
+                                    <p class="text-emerald-700 bg-emerald-50 p-2 rounded border border-emerald-100">
+                                        <strong>Maßnahme:</strong> Enge Einbindung erfahrener Sammler (wie z. B. Kooperationspartner David, der über 20 Kisten beisteuerte) durch faire Honorierung, Ausweise und direkte Bereitstellungs-Absprachen mit der Security.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PITCH FOR FUNDER (FÖRDERANTRAG 2026) -->
+        <section id="funder-pitch" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-br from-emerald-800 to-teal-950 text-white p-8 md:p-12 rounded-3xl shadow-2xl relative overflow-hidden">
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(52,211,153,0.15),transparent)] pointer-events-none"></div>
+                
+                <div class="grid md:grid-cols-12 gap-8 items-center relative z-10">
+                    <div class="md:col-span-8 space-y-6">
+                        <span class="bg-emerald-500/25 border border-emerald-400/30 text-emerald-300 font-bold uppercase text-xs tracking-wider px-3.5 py-1.5 rounded-full inline-block">
+                            Nächster Meilenstein: ColognePride 2026
+                        </span>
+                        <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight leading-none text-white">
+                            Skalierung zum größten Straßenfest Deutschlands
+                        </h2>
+                        <p class="text-slate-200 text-sm md:text-base leading-relaxed max-w-3xl">
+                            Unter dem Projekttitel **„FLÄSCHBÄCK @ ColognePride 2026“** wurde unsere Initiative vom ColognePride e.V. eingeladen, die Abfallvermeidung des dreitägigen Straßenfestes am Heu- und Alter Markt aktiv zu steuern. Dies beinhaltet den Einsatz von 3 Spezialfahrzeugen in der CSD-Parade in enger Kooperation mit der FRÜH Brauerei und der AWB Köln.
+                        </p>
+                        
+                        <div class="grid sm:grid-cols-3 gap-4 text-xs bg-slate-900/40 p-5 rounded-2xl border border-white/10">
+                            <div>
+                                <h4 class="font-bold text-emerald-300 text-sm mb-1">Drei Festwagen</h4>
+                                <p class="text-slate-300">Direkte Begleitung und Wertstoffrettung während der Parade am CSD-Sonntag.</p>
+                            </div>
+                            <div class="border-l border-white/15 pl-4">
+                                <h4 class="font-bold text-emerald-300 text-sm mb-1">100+ Volunteers</h4>
+                                <p class="text-slate-300">Gesteuerte Einbindung von engagierten ehrenamtlichen Kräften und Pride-Helfern.</p>
+                            </div>
+                            <div class="border-l border-white/15 pl-4">
+                                <h4 class="font-bold text-emerald-300 text-sm mb-1">100% Mehrweg</h4>
+                                <p class="text-slate-300">Zirkuläre Logistikkette zur Rückführung direkt an Brauereien und Erzeuger.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FÖRDERMITTEL-BOX -->
+                    <div class="md:col-span-4 bg-white text-slate-900 p-6 rounded-2xl shadow-xl space-y-5 border border-emerald-100">
+                        <div class="text-center">
+                            <span class="text-xs uppercase font-bold text-slate-400 tracking-wider">Förderbedarf Anschubfinanzierung</span>
+                            <div class="text-3xl font-extrabold text-slate-900 mt-1">6.500,00 €</div>
+                            <p class="text-[11px] text-slate-500 mt-1">Zur Deckung der einmaligen Sach- und Logistikkosten</p>
+                        </div>
+                        <hr class="border-slate-200">
+                        <div class="space-y-3 text-xs text-slate-600">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="shield-check" class="text-emerald-600 w-5 h-5 flex-shrink-0"></i>
+                                <span>Reflektierende Sicherheitskleidung & Ausweise</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="truck" class="text-emerald-600 w-5 h-5 flex-shrink-0"></i>
+                                <span>Miete Lkw mit Hebebühne & Gitterboxen</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="users" class="text-emerald-600 w-5 h-5 flex-shrink-0"></i>
+                                <span>Volunteer-Verpflegung & Aufwandsentschädigungen</span>
+                            </div>
+                        </div>
+                        <button onclick="alert('Vielen Dank für Ihr Interesse! Bitte wenden Sie sich direkt an uns per E-Mail oder Telefon (0177-3302711), um das vollständige Antrags-PDF und die Fördervereinbarung einzusehen.')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg text-xs transition-colors shadow-lg hover:shadow-emerald-900/10 uppercase tracking-wider">
+                            Förderer-Kontakt anfordern
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER / PARTNERS -->
+    <footer class="bg-slate-900 text-slate-400 py-12 px-4 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-12 gap-8 items-center">
+            <div class="md:col-span-4 space-y-3">
+                <div class="flex items-center space-x-2">
+                    <div class="bg-emerald-600 text-white p-1.5 rounded-md flex items-center justify-center">
+                        <i data-lucide="recycle" class="w-4 h-4"></i>
+                    </div>
+                    <span class="font-bold text-white text-md tracking-wider">FLÄSCHBÄCK KÖLN</span>
+                </div>
+                <p class="text-xs leading-relaxed max-w-xs text-slate-400">
+                    Eine Initiative Kölner Vereine und ehrenamtlicher Akteure für eine nachhaltige Kreislaufwirtschaft im Veranstaltungswesen.
+                </p>
+            </div>
+
+            <!-- NETWORK PARTNERS -->
+            <div class="md:col-span-8 space-y-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Unterstützt von führenden Kölner Partnern</h4>
+                <div class="flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold text-slate-500">
+                    <span class="hover:text-slate-300 transition-colors">KG Grüne Rheinfunken e.V. / GLORIA</span>
+                    <span class="hover:text-slate-300 transition-colors">Zero Waste Köln e.V.</span>
+                    <span class="hover:text-slate-300 transition-colors">KISD / Innovationsbüro Stadt Köln</span>
+                    <span class="hover:text-slate-300 transition-colors">Klimafestival Köln / Klimaschutzstelle</span>
+                    <span class="hover:text-slate-300 transition-colors">Radio Köln & KSTA (Medienecho)</span>
+                </div>
+                <div class="text-[11px] text-slate-500 pt-3 border-t border-slate-800 flex justify-between">
+                    <span>© 2026 FLÄSCHBÄCK Initiative Köln. Alle Rechte vorbehalten.</span>
+                    <span>Kontakt Orga-Büro: Michael Cieslik & Claudia Wedell (0177-3302711)</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE SCRIPT: THREE.JS MAP & ADMIN FLOW -->
+    <script>
+        // --- Globaler Datenbestand der OSM Gebäude und Event-Infrastruktur ---
+        const osmBuildings = [
+            {
+                "osm_id": 42693264,
+                "building": "apartments",
+                "building:levels": 4,
+                "way": "P((6496 56925,1491 1720,1318 -1155,-1486 -1709,-1323 1144))"
+            },
+            {
+                "osm_id": 42693265,
+                "building": "apartments",
+                "building:levels": 4,
+                "way": "P((2858 54029,1012 165,79 -398,537 -16,185 -160,233 245,737 -618,-1490 -1752,-882 207,-411 2327))"
+            },
+            {
+                "osm_id": 690724662,
+                "building": "apartments",
+                "building:levels": 5,
+                "way": "P((40674 11569,858 -1036,-1338 -1081,-857 1033,1337 1084))"
+            }
+        ];
+
+        // Startdaten für die Reallabor-Infrastruktur und Hotspots
+        const defaultEventItems = [
+            {
+                "id": "1",
+                "type": "zelt",
+                "x": -5.0,
+                "z": 10.0,
+                "title": "Logistikzentrum Bonner Straße",
+                "text": "Zentrale Koordination der ehrenamtlichen Kräfte, Ausgabe von gebrandeten T-Shirts, Handschuhen und Bollerwagen. Hier befand sich das Begrüßungs- und Verpflegungsteam (Michael, Fred)."
+            },
+            {
+                "id": "2",
+                "type": "muell",
+                "x": -15.0,
+                "z": -5.0,
+                "title": "Wertstoff-Sammelstation Süd",
+                "text": "Aufstellort für kommissionierte Pfandkästen. Bollerwagenteams lieferten im 20-Minuten-Takt volle Kästen an und erhielten frisches Leergut für die Route. Betreut von der 'Loader'-Gruppe."
+            },
+            {
+                "id": "3",
+                "type": "hotspot",
+                "x": 20.0,
+                "z": 5.0,
+                "title": "Hotspot: Lerneffekt Rückwärtslogistik",
+                "text": "Da die AWB-Veranstaltungstonnen fälschlicherweise für Glas freigegeben waren, landeten viele Flaschen im Restmüll. Zukünftige Forderung: Eine strikte visuelle Verbannung von Glas auf den Tonnenaufklebern."
+            },
+            {
+                "id": "4",
+                "type": "hotspot",
+                "x": 2.0,
+                "z": -2.0,
+                "title": "Sicherheits-Feedback Rettungsdienst",
+                "text": "Die Rettungsdienste vermeldeten eine signifikante Senkung von Schnittverletzungen im Festbereich. Ein riesiger sozialer Benefit der schnellen Scherbenbeseitigung durch unsere mobilen Fuß-Teams."
+            }
+        ];
+
+        let eventItems = [];
+        let mapMode = 'view'; // 'view' oder 'admin'
+        let selectedObject = null;
+
+        // --- Three.js Szenen-Setup ---
+        let scene, camera, renderer, controls;
+        let mapScaleFactor = 0.0006; // Angepasster Skalierungsfaktor für OSM-Daten im Three.js Grid
+        let globalCenterX = 0;
+        let globalCenterY = 0;
+        let groundPlane;
+        let itemMeshGroup;
+
+        // Farbdefinitionen für die 3D Marker
+        const itemColors = {
+            zelt: 0xf8fafc,      // Weiß/Lichtgrau für Zelte
+            bude: 0xf97316,      // Orange für Verkaufsbuden
+            muell: 0x10b981,     // Smaragdgrün für Müll/Wertstoff
+            toilette: 0x3b82f6,  // Blau für Sanitär
+            hotspot: 0xef4444    // Rot für Lerneffekte/Auffälligkeiten
+        };
+
+        // --- Initialisierung nach dem Laden des DOMs ---
+        window.addEventListener('load', () => {
+            lucide.createIcons();
+            initThreeJS();
+            loadLayoutFromStorage();
+            renderBuildings();
+            renderEventItems();
+            
+            // Loader ausblenden
+            setTimeout(() => {
+                document.getElementById('map-loader').classList.add('opacity-0');
+                setTimeout(() => {
+                    document.getElementById('map-loader').style.display = 'none';
+                }, 500);
+            }, 800);
+        });
+
+        function initThreeJS() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf1f5f9);
+
+            // Isometrischer Blickwinkel über Orthografische Kamera
+            const aspect = container.clientWidth / container.clientHeight;
+            const d = 25; 
+            camera = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 1, 1000);
+            
+            // Klassischer 2.5D isometrischer Kamera-Winkel
+            camera.position.set(35, 35, 35);
+            camera.lookAt(0, 0, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            // Orbit Controls zur Navigation (Drehen & Zoomen)
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxZoom = 4.5;
+            controls.minZoom = 0.5;
+
+            // --- Lichtstimmungen ---
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
+            scene.add(ambientLight);
+
+            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.4);
+            hemiLight.position.set(0, 50, 0);
+            scene.add(hemiLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            dirLight.position.set(30, 45, 20);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 1024;
+            dirLight.shadow.mapSize.height = 1024;
+            dirLight.shadow.camera.left = -30;
+            dirLight.shadow.camera.right = 30;
+            dirLight.shadow.camera.top = 30;
+            dirLight.shadow.camera.bottom = -30;
+            dirLight.shadow.camera.near = 0.5;
+            dirLight.shadow.camera.far = 150;
+            scene.add(dirLight);
+
+            // Grid / Boden als asphaltierter Hintergrund
+            const groundGeo = new THREE.PlaneGeometry(120, 120);
+            const groundMat = new THREE.MeshStandardMaterial({ 
+                color: 0xe2e8f0,
+                roughness: 0.8,
+                metalness: 0.1
+            });
+            groundPlane = new THREE.Mesh(groundGeo, groundMat);
+            groundPlane.rotation.x = -Math.PI / 2;
+            groundPlane.receiveShadow = true;
+            scene.add(groundPlane);
+
+            const gridHelper = new THREE.GridHelper(100, 50, 0xcbd5e1, 0xe2e8f0);
+            gridHelper.position.y = 0.01; // minimal über dem Asphalt
+            scene.add(gridHelper);
+
+            // Gruppe für die CMS-Infrastruktur-Objekte
+            itemMeshGroup = new THREE.Group();
+            scene.add(itemMeshGroup);
+
+            // Window Resize anpassen
+            window.addEventListener('resize', onWindowResize);
+
+            // Raycaster für Klicks auf Objekte
+            container.addEventListener('click', onMapClick);
+
+            // Animations-Loop starten
+            animate();
+        }
+
+        // --- OSM Daten-Parser & Extrusion (FEHLERFREIER RELATIVER PFAD-ALGORITHMUS) ---
+        function renderBuildings() {
+            let globalMinX = Infinity, globalMaxX = -Infinity;
+            let globalMinY = Infinity, globalMaxY = -Infinity;
+
+            // 1. Pass: Bestimmung der echten Bounding Box aller Gebäude-Wege (Akkumulation der relativen Pfade)
+            osmBuildings.forEach(building => {
+                const matches = building.way.match(/P\(\((.*?)\)\)/);
+                if (!matches) return;
+                const coordPairs = matches[1].split(',');
+                
+                let currentX = 0;
+                let currentY = 0;
+
+                coordPairs.forEach((pair, index) => {
+                    const coords = pair.trim().split(' ').map(Number);
+                    if (index === 0) {
+                        currentX = coords[0];
+                        currentY = coords[1];
+                    } else {
+                        // Alle nachfolgenden Punkte sind relative Offsets zum Vorgänger-Punkt!
+                        currentX += coords[0];
+                        currentY += coords[1];
+                    }
+
+                    if (currentX < globalMinX) globalMinX = currentX;
+                    if (currentX > globalMaxX) globalMaxX = currentX;
+                    if (currentY < globalMinY) globalMinY = currentY;
+                    if (currentY > globalMaxY) globalMaxY = currentY;
+                });
+            });
+
+            // Berechnung des exakten geometrischen Centers der Karte zur zentrierten Darstellung
+            globalCenterX = (globalMinX + globalMaxX) / 2;
+            globalCenterY = (globalMinY + globalMaxY) / 2;
+
+            // 2. Pass: Aufbau der 3D-Körper
+            osmBuildings.forEach(building => {
+                const matches = building.way.match(/P\(\((.*?)\)\)/);
+                if (!matches) return;
+                const coordPairs = matches[1].split(',');
+                
+                const shape = new THREE.Shape();
+                let currentX = 0;
+                let currentY = 0;
+
+                coordPairs.forEach((pair, index) => {
+                    const coords = pair.trim().split(' ').map(Number);
+                    if (index === 0) {
+                        currentX = coords[0];
+                        currentY = coords[1];
+                    } else {
+                        currentX += coords[0];
+                        currentY += coords[1];
+                    }
+
+                    // Skalierung und Zentrierung um den globalen Ursprung
+                    const mapX = (currentX - globalCenterX) * mapScaleFactor;
+                    const mapZ = (currentY - globalCenterY) * mapScaleFactor;
+
+                    if (index === 0) {
+                        shape.moveTo(mapX, mapZ);
+                    } else {
+                        shape.lineTo(mapX, mapZ);
+                    }
+                });
+
+                // Extrusions-Eigenschaften für realistischen Gebäude-Look
+                const buildingLevels = building["building:levels"] || 4;
+                const height = buildingLevels * 1.8; // Etagenhöhe skaliert
+
+                const extrudeSettings = {
+                    depth: height,
+                    bevelEnabled: true,
+                    bevelSegments: 2,
+                    steps: 1,
+                    bevelSize: 0.05,
+                    bevelThickness: 0.05
+                };
+
+                const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+                
+                // Da Extrusionen standardmäßig nach Z extrudieren, drehen wir die Geometrie auf die Y-Achse
+                geometry.rotateX(-Math.PI / 2);
+
+                const material = new THREE.MeshStandardMaterial({ 
+                    color: 0xffffff, // Cleane weiße Fassadenoptik
+                    roughness: 0.5,
+                    metalness: 0.05
+                });
+
+                const buildingMesh = new THREE.Mesh(geometry, material);
+                buildingMesh.castShadow = true;
+                buildingMesh.receiveShadow = true;
+                
+                // Kanten-Schatten zur besseren isometrischen Erkennbarkeit (Wireframe-Overlay)
+                const edges = new THREE.EdgesGeometry(geometry);
+                const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xe2e8f0 }));
+                buildingMesh.add(line);
+
+                scene.add(buildingMesh);
+            });
+        }
+
+        // --- 3D-MARKER ERSTELLUNG (KREATIV & INTERAKTIV) ---
+        function renderEventItems() {
+            // Alte Meshes entfernen
+            while(itemMeshGroup.children.length > 0){
+                itemMeshGroup.remove(itemMeshGroup.children[0]);
+            }
+
+            eventItems.forEach(item => {
+                let markerMesh;
+                
+                if (item.type === 'zelt') {
+                    // Repräsentation als quadratisches Party-Pavillon-Zelt
+                    const zeltGroup = new THREE.Group();
+                    const roofGeo = new THREE.ConeGeometry(1.4, 1.2, 4);
+                    const roofMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 });
+                    const roof = new THREE.Mesh(roofGeo, roofMat);
+                    roof.position.y = 1.8;
+                    roof.rotation.y = Math.PI / 4;
+                    zeltGroup.add(roof);
+
+                    // 4 Zelt-Stützen
+                    const postGeo = new THREE.CylinderGeometry(0.08, 0.08, 1.3);
+                    const postMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8 });
+                    
+                    const positions = [[0.8, 0.85, 0.8], [-0.8, 0.85, 0.8], [0.8, 0.85, -0.8], [-0.8, 0.85, -0.8]];
+                    positions.forEach(pos => {
+                        const post = new THREE.Mesh(postGeo, postMat);
+                        post.position.set(pos[0], pos[1], pos[2]);
+                        zeltGroup.add(post);
+                    });
+
+                    markerMesh = zeltGroup;
+                } else if (item.type === 'muell') {
+                    // Repräsentation als grüne Wertstofftonne
+                    const barrelGroup = new THREE.Group();
+                    const bodyGeo = new THREE.CylinderGeometry(0.7, 0.6, 1.4, 16);
+                    const bodyMat = new THREE.MeshStandardMaterial({ color: itemColors.muell, roughness: 0.4 });
+                    const body = new THREE.Mesh(bodyGeo, bodyMat);
+                    body.position.y = 0.7;
+                    barrelGroup.add(body);
+
+                    const lidGeo = new THREE.CylinderGeometry(0.75, 0.75, 0.15, 16);
+                    const lidMat = new THREE.MeshStandardMaterial({ color: 0x065f46 });
+                    const lid = new THREE.Mesh(lidGeo, lidMat);
+                    lid.position.y = 1.4;
+                    barrelGroup.add(lid);
+
+                    markerMesh = barrelGroup;
+                } else if (item.type === 'hotspot') {
+                    // Pulsierender Warn-Pin
+                    const pinGroup = new THREE.Group();
+                    const sphereGeo = new THREE.SphereGeometry(0.6, 16, 16);
+                    const sphereMat = new THREE.MeshStandardMaterial({ 
+                        color: itemColors.hotspot, 
+                        roughness: 0.1,
+                        emissive: 0xef4444,
+                        emissiveIntensity: 0.3
+                    });
+                    const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+                    sphere.position.y = 1.8;
+                    pinGroup.add(sphere);
+
+                    const coneGeo = new THREE.ConeGeometry(0.4, 1.2, 16);
+                    const coneMat = new THREE.MeshStandardMaterial({ color: itemColors.hotspot });
+                    const cone = new THREE.Mesh(coneGeo, coneMat);
+                    cone.position.y = 0.9;
+                    cone.rotation.x = Math.PI;
+                    pinGroup.add(cone);
+
+                    markerMesh = pinGroup;
+                } else if (item.type === 'toilette') {
+                    // Repräsentation als blauer WC-Container
+                    const boxGeo = new THREE.BoxGeometry(1.4, 2.0, 1.4);
+                    const boxMat = new THREE.MeshStandardMaterial({ color: itemColors.toilette, roughness: 0.6 });
+                    const box = new THREE.Mesh(boxGeo, boxMat);
+                    box.position.y = 1.0;
+                    markerMesh = box;
+                } else {
+                    // Standardmäßig Verkaufsbude / Block
+                    const boxGeo = new THREE.BoxGeometry(1.6, 1.3, 1.3);
+                    const boxMat = new THREE.MeshStandardMaterial({ color: itemColors.bude, roughness: 0.7 });
+                    const box = new THREE.Mesh(boxGeo, boxMat);
+                    box.position.y = 0.65;
+                    markerMesh = box;
+                }
+
+                // Parent für Raycasting und CMS Meta-Zuweisung
+                markerMesh.position.set(item.x, 0, item.z);
+                markerMesh.userData = { 
+                    itemId: item.id, 
+                    isEventItem: true 
+                };
+
+                // Schlagschatten für die Marker aktivieren
+                markerMesh.traverse(child => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
+                itemMeshGroup.add(markerMesh);
+            });
+        }
+
+        // --- INTERAKTIONS-LOGIK (KLICK & PLATZIERUNG) ---
+        function onMapClick(event) {
+            const container = document.getElementById('canvas-container');
+            const rect = renderer.domElement.getBoundingClientRect();
+            
+            // Normierte Maus-Koordinaten berechnen
+            const mouse = new THREE.Vector2();
+            mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, camera);
+
+            if (mapMode === 'admin') {
+                // Prüfen, ob ein bestehendes Element im Adminbereich angeklickt wurde (zum Editieren)
+                const intersectsItems = raycaster.intersectObjects(itemMeshGroup.children, true);
+                if (intersectsItems.length > 0) {
+                    // Parent-Objekt mit Meta-Daten ausfindig machen
+                    let rootObj = intersectsItems[0].object;
+                    while (rootObj.parent && rootObj.parent !== itemMeshGroup) {
+                        rootObj = rootObj.parent;
+                    }
+                    const clickedItem = eventItems.find(i => i.id === rootObj.userData.itemId);
+                    if (clickedItem) {
+                        openCmsEditor(clickedItem);
+                        return;
+                    }
+                }
+
+                // Andernfalls: Klick auf den Asphalt zur Platzierung eines neuen Objekts
+                const intersectsGround = raycaster.intersectObject(groundPlane);
+                if (intersectsGround.length > 0) {
+                    const intersectPoint = intersectsGround[0].point;
+                    createNewItemAt(intersectPoint.x, intersectPoint.z);
+                }
+            } else {
+                // Fördermittelgeber-Betrachtungs-Modus: Objekt anklicken für Info-Overlay
+                const intersectsItems = raycaster.intersectObjects(itemMeshGroup.children, true);
+                const infoPanelEmpty = document.getElementById('view-empty-state');
+                const infoPanelContent = document.getElementById('view-content');
+
+                if (intersectsItems.length > 0) {
+                    let rootObj = intersectsItems[0].object;
+                    while (rootObj.parent && rootObj.parent !== itemMeshGroup) {
+                        rootObj = rootObj.parent;
+                    }
+                    const clickedItem = eventItems.find(i => i.id === rootObj.userData.itemId);
+                    if (clickedItem) {
+                        selectedObject = rootObj;
+                        
+                        // Infokarte füllen
+                        document.getElementById('view-title').innerText = clickedItem.title;
+                        document.getElementById('view-description').innerText = clickedItem.text;
+                        
+                        const badge = document.getElementById('view-badge-type');
+                        badge.innerText = clickedItem.type.toUpperCase();
+                        
+                        // Farbe des Badges anpassen
+                        badge.className = "inline-block text-[10px] font-bold tracking-widest uppercase px-2 py-1 rounded ";
+                        if (clickedItem.type === 'hotspot') badge.className += "bg-rose-100 text-rose-800";
+                        else if (clickedItem.type === 'muell') badge.className += "bg-emerald-100 text-emerald-800";
+                        else if (clickedItem.type === 'zelt') badge.className += "bg-slate-200 text-slate-800";
+                        else if (clickedItem.type === 'toilette') badge.className += "bg-blue-100 text-blue-800";
+                        else badge.className += "bg-amber-100 text-amber-800";
+
+                        infoPanelEmpty.classList.add('hidden');
+                        infoPanelContent.classList.remove('hidden');
+                    }
+                } else {
+                    selectedObject = null;
+                    infoPanelEmpty.classList.remove('hidden');
+                    infoPanelContent.classList.add('hidden');
+                }
+            }
+        }
+
+        // --- CMS OPERATIONEN (CRUD) ---
+        function createNewItemAt(x, z) {
+            const newItem = {
+                id: "item_" + Date.now(),
+                type: "bude",
+                x: parseFloat(x.toFixed(2)),
+                z: parseFloat(z.toFixed(2)),
+                title: "Neues Objekt",
+                text: "Bitte hier eine detaillierte Auswertung oder Beschreibung hinterlegen."
+            };
+            eventItems.push(newItem);
+            renderEventItems();
+            openCmsEditor(newItem);
+        }
+
+        function openCmsEditor(item) {
+            document.getElementById('edit-item-id').value = item.id;
+            document.getElementById('edit-item-x').value = item.x;
+            document.getElementById('edit-item-z').value = item.z;
+            document.getElementById('edit-item-type').value = item.type;
+            document.getElementById('edit-item-title').value = item.title;
+            document.getElementById('edit-item-desc').value = item.text;
+
+            document.getElementById('btn-delete').classList.remove('hidden');
+            document.getElementById('panel-state').innerText = "Bearbeitungs-Modus";
+        }
+
+        function saveCurrentItem(event) {
+            event.preventDefault();
+            const id = document.getElementById('edit-item-id').value;
+            if(!id) return;
+
+            const idx = eventItems.findIndex(i => i.id === id);
+            if(idx !== -1) {
+                eventItems[idx].type = document.getElementById('edit-item-type').value;
+                eventItems[idx].title = document.getElementById('edit-item-title').value;
+                eventItems[idx].text = document.getElementById('edit-item-desc').value;
+
+                renderEventItems();
+                resetCmsForm();
+                alert("Änderungen lokal auf der Karte übernommen. Klicken Sie anschließend auf 'Layout permanent speichern'.");
+            }
+        }
+
+        function deleteCurrentItem() {
+            const id = document.getElementById('edit-item-id').value;
+            if(!id) return;
+
+            eventItems = eventItems.filter(i => i.id !== id);
+            renderEventItems();
+            resetCmsForm();
+        }
+
+        function resetCmsForm() {
+            document.getElementById('cms-form').reset();
+            document.getElementById('edit-item-id').value = "";
+            document.getElementById('btn-delete').classList.add('hidden');
+            document.getElementById('panel-state').innerText = "Bereit";
+        }
+
+        function updateFormDefaults() {
+            // Optionale Anpassung beim Wechseln des Typs im CMS
+        }
+
+        // --- DATEN-PERSISTENZ & LOCALSTORAGE FLOW ---
+        function saveLayoutToDatabase() {
+            // Wir versuchen, den Speicherstand an das Flask Backend zu senden
+            fetch('/api/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(eventItems)
+            })
+            .then(res => {
+                if(res.ok) {
+                    alert("Erfolgreich: Layout wurde persistent in der items.json auf Ihrem Linux-Webserver gesichert!");
+                } else {
+                    // LocalStorage Ausfall-Sicherung
+                    saveToLocalStorage();
+                }
+            })
+            .catch(err => {
+                // Offline oder Standalone-Modus
+                saveToLocalStorage();
+            });
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('flaeschbaeck_items_mvp', JSON.stringify(eventItems));
+            alert("Schnittstellen-Hinweis: Die Daten wurden in Ihrem Browser (LocalStorage) gesichert, da kein lokales Flask-Backend erreichbar ist. Nutzen Sie das untenstehende JSON-Panel zur permanenten Speicherung im Linux-Dateisystem.");
+            updateJsonTextArea();
+        }
+
+        function loadLayoutFromStorage() {
+            // Erst versuchen wir, die Daten über die Backend-API abzufragen
+            fetch('/api/items')
+            .then(res => {
+                if(res.ok) return res.json();
+                throw new Error("API Offline");
+            })
+            .then(data => {
+                if(data && data.length > 0) {
+                    eventItems = data;
+                } else {
+                    eventItems = defaultEventItems;
+                }
+                renderEventItems();
+                updateJsonTextArea();
+            })
+            .catch(err => {
+                // Bei Fehlschlag weichen wir auf LocalStorage oder Standarddaten aus
+                const stored = localStorage.getItem('flaeschbaeck_items_mvp');
+                if (stored) {
+                    eventItems = JSON.parse(stored);
+                } else {
+                    eventItems = defaultEventItems;
+                }
+                renderEventItems();
+                updateJsonTextArea();
+            });
+        }
+
+        // --- JSON CONFIGURATION IMPORT/EXPORT CODES ---
+        function toggleJsonConfigPanel() {
+            const panel = document.getElementById('json-panel');
+            panel.classList.toggle('hidden');
+            updateJsonTextArea();
+        }
+
+        function updateJsonTextArea() {
+            document.getElementById('json-io-area').value = JSON.stringify(eventItems, null, 4);
+        }
+
+        function importJsonConfig() {
+            const areaValue = document.getElementById('json-io-area').value;
+            try {
+                const parsed = JSON.parse(areaValue);
+                if(Array.isArray(parsed)) {
+                    eventItems = parsed;
+                    renderEventItems();
+                    saveToLocalStorage();
+                    alert("Layout erfolgreich über die Konfiguration importiert!");
+                } else {
+                    alert("Fehler: Das übertragene Format muss ein valides JSON-Array sein.");
+                }
+            } catch(e) {
+                alert("Syntaxfehler im JSON-String. Bitte prüfen Sie Ihre Eingabe.");
+            }
+        }
+
+        // --- TAB STEUERUNG (PROJEKTDOKUMENTATION) ---
+        function switchTab(tabId) {
+            // Alle Tab-Inhalte ausblenden
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Aktiven Tab-Inhalt einblenden
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Tab-Schaltflächen optisch zurücksetzen
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('border-emerald-600', 'text-emerald-600');
+                btn.classList.add('border-transparent', 'text-slate-500');
+            });
+
+            // Aktive Schaltfläche hervorheben
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.remove('border-transparent', 'text-slate-500');
+                activeBtn.classList.add('border-emerald-600', 'text-emerald-600');
+            }
+        }
+
+        // --- MAP MODUS STEUERUNG (FÖRDERER vs ADMIN) ---
+        function setMapMode(mode) {
+            mapMode = mode;
+            const btnView = document.getElementById('btn-view-mode');
+            const btnAdmin = document.getElementById('btn-admin-mode');
+            const badgeMode = document.getElementById('badge-mode');
+            const badgeText = document.getElementById('badge-text');
+            const viewPanel = document.getElementById('view-panel');
+            const adminPanel = document.getElementById('admin-panel');
+
+            if (mode === 'admin') {
+                btnAdmin.className = "px-4 py-2 rounded-lg font-semibold text-sm transition-all flex items-center space-x-2 bg-slate-900 text-white shadow-md";
+                btnView.className = "px-4 py-2 rounded-lg font-semibold text-sm transition-all flex items-center space-x-2 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50";
+                
+                badgeMode.className = "bg-yellow-600 text-white px-3 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-md flex items-center space-x-1.5";
+                badgeText.innerText = "PLANUNGS-CMS MODUS ACTIVE";
+
+                viewPanel.classList.add('hidden');
+                adminPanel.classList.remove('hidden');
+                resetCmsForm();
+            } else {
+                btnView.className = "px-4 py-2 rounded-lg font-semibold text-sm transition-all flex items-center space-x-2 bg-emerald-600 text-white shadow-md";
+                btnAdmin.className = "px-4 py-2 rounded-lg font-semibold text-sm transition-all flex items-center space-x-2 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50";
+                
+                badgeMode.className = "bg-emerald-600 text-white px-3 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-md flex items-center space-x-1.5";
+                badgeText.innerText = "FÖRDERER-MODUS ACTIVE";
+
+                viewPanel.classList.remove('hidden');
+                adminPanel.classList.add('hidden');
+                
+                document.getElementById('view-empty-state').classList.remove('hidden');
+                document.getElementById('view-content').classList.add('hidden');
+            }
+        }
+
+        // --- Hilfsfunktionen für Render-Schleife und UI ---
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            
+            // Kleine Rotationseffekte oder Pulsieren von bestimmten Markern bei Bedarf
+            if (itemMeshGroup && itemMeshGroup.children.length > 0) {
+                const time = Date.now() * 0.003;
+                itemMeshGroup.children.forEach(mesh => {
+                    if (mesh.userData && mesh.userData.itemId) {
+                        const item = eventItems.find(i => i.id === mesh.userData.itemId);
+                        if (item && item.type === 'hotspot') {
+                            // Pulsierende Höhenbewegung für Hotspot-Warnpins
+                            mesh.position.y = Math.sin(time) * 0.15;
+                        }
+                    }
+                });
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            const aspect = container.clientWidth / container.clientHeight;
+            const d = 25;
+            
+            camera.left = -d * aspect;
+            camera.right = d * aspect;
+            camera.top = d;
+            camera.bottom = -d;
+            camera.updateProjectionMatrix();
+            
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
